@@ -85,3 +85,39 @@ struct SegmentTree {
         return query(x, y, vroots[version]);
     }
 };
+
+int main() {
+    int n = 0;
+    cin >> n;
+    vector<int> ans;
+
+    vector<int> arr(n);
+
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    SegmentTree<int> S(1, n, arr);
+
+    int m;
+    cin >> m;
+
+    while (m--) {
+        string op;
+        cin >> op;
+
+        if (op == "create") {
+            int a, b, c;
+            cin >> a >> b >> c;
+            S.update(a - 1, b, c);
+        }
+        else if (op == "get") {
+            int e, f;
+            cin >> e >> f;
+            ans.push_back(S.query(e - 1, f, f));
+        }
+    }
+    for (int x : ans) {
+    cout << x << endl;
+}
+}

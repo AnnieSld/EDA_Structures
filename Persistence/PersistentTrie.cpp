@@ -16,7 +16,6 @@ struct PersistentTrie {
                 child[i] = nullptr;
         }
     };
-
     vector<Node*> roots;
 
     PersistentTrie() {
@@ -69,3 +68,4 @@ struct PersistentTrie {
         return roots.size() - 1;
     }
 };
+

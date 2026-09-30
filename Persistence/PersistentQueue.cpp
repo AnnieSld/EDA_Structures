@@ -19,11 +19,28 @@ struct SegmentTree {
     };
 
     vector<Node*> vroots;
+    SegmentTree(int n) {
+        vroots.emplace_back(new Node(data_type(), 0, n - 1, nullptr, nullptr));
+        build(vroots[0]);
+    }
 
     SegmentTree(int l, int r, vector<data_type> &a) {
         vroots.emplace_back(new Node(data_type(), l, r, nullptr, nullptr));
         build(vroots[0], a);
     }
+
+    void build(Node *root) {
+        if (root -> l == root -> r) {
+        root -> data = data_type();
+        return;
+        }
+        int mi = (root -> l + root -> r) / 2;
+        root -> left = new Node(data_type(), root -> l, mi, nullptr, nullptr);
+        root -> right = new Node(data_type(), mi + 1, root -> r, nullptr, nullptr);
+        build(root -> left);
+        build(root -> right);
+        }
+
 
     void build(Node *root, vector<data_type> &a) {
         if (root->l == root->r) {
@@ -84,4 +101,59 @@ struct SegmentTree {
     data_type query(int version, int x, int y) {
         return query(x, y, vroots[version]);
     }
+    int get_vcurr(){
+        return (int)vroots.size()-1;
+    }
 };
+
+
+template<typename data_type>
+struct PersistentQueue{
+        vector<int> tails;
+        vector<int> roots;
+        vector<int> heads;
+        SegmentTree<data_type> S;
+
+        PersistentQueue(int max_cap): S(max_cap){
+            roots.emplace_back(S.get_vcurr());
+            heads.emplace_back(0);
+            tails.emplace_back(0);
+        }
+        void push(int v, data_type x){
+            S.update(roots[v], tails[v], x);
+            roots.emplace_back(S.get_vcurr());
+            heads.emplace_back(heads[v]);
+            tails.emplace_back(tails[v]+1);
+        }
+        data_type pop(int v){
+            data_type ans = S.query(roots[v], heads[v], heads[v]);
+            roots.emplace_back(roots[v]);
+            heads.emplace_back(heads[v]+1);
+            tails.emplace_back(tails[v]);
+            return ans;
+        }
+
+};
+
+int main() {
+
+    int m;
+    cin >> m;
+    PersistentQueue<int> Q(m+1);
+
+    while (m--) {
+        int op;
+        cin >> op;
+
+        if (op == 1) {
+            int a, b;
+            cin >> a >> b;
+            Q.push(a, b);
+        }
+        else if (op == -1) {
+            int e;
+            cin >> e;
+            cout << Q.pop(e) << '\n';
+        }
+    }
+}
